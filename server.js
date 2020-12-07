@@ -83,6 +83,39 @@ app.get('/incidents', (req, res) => {
 app.put('/new-incident', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
+    let newJSON = {
+        "case_number" : "19245020",
+        "date_time" : "2019-10-30T23:57:08",
+        "code": 9954,
+        "incident": "Proactive Police Visit",
+        "police_grid": 87,
+        "neighborhood_number": 7,
+        "block": "THOMAS AV & VICTORIA"
+    }
+    //newIncidents.push(newJSON);
+
+    newJSON.case_number = url.searchParams.get('case_number');
+    newJSON.date_time = url.searchParams.get('date') + "T" + url.searchParams.get('time');
+    newJSON.code = parseInt(url.searchParams.get('code'));
+    newJSON.incident = url.searchParams.get('incident');
+    newJSON.police_grid = parseInt(url.searchParams.get('police_grid'));
+    newJSON.neighborhood_number = parseInt(url.searchParams.get('neighborhood_number'));
+    newJSON.block = url.searchParams.get('block');
+    
+    db.run("INSERT INTO incidents VALUES (:case_number, :date_time, :code, :incident, :police_grid, :neighborhood_number, :block)",
+            {
+                'case_number': url.searchParams.get('case_number'),
+                'date_time': url.searchParams.get('date') + "T" + url.searchParams.get('time'),
+                'code': parseInt(url.searchParams.get('code')),
+                'incident': url.searchParams.get('incident'),
+                'police_grid': parseInt(url.searchParams.get('police_grid')),
+                'neighborhood_number': parseInt(url.searchParams.get('neighborhood_number')),
+                'block': url.searchParams.get('block')
+            })
+    //console.log(query);
+    //db.run(query);
+    console.log(newJSON);
+
     res.status(200).type('txt').send('success');
 });
 
