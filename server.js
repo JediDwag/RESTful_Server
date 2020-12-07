@@ -31,8 +31,17 @@ app.use(express.static(public_dir));
 // Respond with list of codes and their corresponding incident type
 app.get('/codes', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-    
-    res.status(200).type('json').send({});
+
+    let query = "SELECT * FROM codes ORDER BY code;";
+    db.all(query, [], (err, rows) => {
+        if(err){
+            res.status(500).send('Database access error');
+            console.log("Error ", err.message);   
+        }
+        else{
+            res.status(200).type('json').send({rows});
+        }
+    })
 });
 
 // REST API: GET /neighborhoods
@@ -40,7 +49,16 @@ app.get('/codes', (req, res) => {
 app.get('/neighborhoods', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
-    res.status(200).type('json').send({});
+    let query = "SELECT * FROM neighborhoods ORDER BY neighborhood_number;";
+    db.all(query, [], (err, rows) => {
+        if(err){
+            res.status(500).send('Database access error');
+            console.log("Error ", err.message);   
+        }
+        else{
+            res.status(200).type('json').send({rows});
+        }
+    })
 });
 
 // REST API: GET/incidents
@@ -48,7 +66,16 @@ app.get('/neighborhoods', (req, res) => {
 app.get('/incidents', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
-    res.status(200).type('json').send({});
+    let query = "SELECT * FROM incidents ORDER BY date_time;";
+    db.all(query, [], (err, rows) => {
+        if(err){
+            res.status(500).send('Database access error');
+            console.log("Error ", err.message);   
+        }
+        else{
+            res.status(200).type('json').send({rows});
+        }
+    })
 });
 
 // REST API: PUT /new-incident
