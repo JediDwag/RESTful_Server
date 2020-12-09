@@ -31,6 +31,7 @@ app.use(express.static(public_dir));
 // Respond with list of codes and their corresponding incident type
 app.get('/codes', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+    console.log("/codes: request");
 
     let query = "SELECT * FROM codes ORDER BY code;";
     db.all(query, [], (err, rows) => {
@@ -56,7 +57,7 @@ app.get('/neighborhoods', (req, res) => {
             console.log("Error ", err.message);   
         }
         else{
-            res.status(200).type('json').send({rows});
+            res.status(200).type('json').send(rows);
         }
     })
 });
@@ -73,7 +74,7 @@ app.get('/incidents', (req, res) => {
             console.log("Error ", err.message);   
         }
         else{
-            res.status(200).type('json').send({rows});
+            res.status(200).type('json').send(rows);
         }
     })
 });
@@ -82,38 +83,78 @@ app.get('/incidents', (req, res) => {
 // Respond with 'success' or 'error'
 app.put('/new-incident', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-
-    let newJSON = {
-        "case_number" : "19245020",
-        "date_time" : "2019-10-30T23:57:08",
-        "code": 9954,
-        "incident": "Proactive Police Visit",
-        "police_grid": 87,
-        "neighborhood_number": 7,
-        "block": "THOMAS AV & VICTORIA"
-    }
-
-    newJSON.case_number = url.searchParams.get('case_number');
-    newJSON.date_time = url.searchParams.get('date') + "T" + url.searchParams.get('time');
-    newJSON.code = parseInt(url.searchParams.get('code'));
-    newJSON.incident = url.searchParams.get('incident');
-    newJSON.police_grid = parseInt(url.searchParams.get('police_grid'));
-    newJSON.neighborhood_number = parseInt(url.searchParams.get('neighborhood_number'));
-    newJSON.block = url.searchParams.get('block');
+    let case_number = url.searchParams.get('case_number');
+    let date = url.searchParams.get('date');
+    let time = url.searchParams.get('time');
+    let code = url.searchParams.get('code');
+    let incident = url.searchParams.get('incident');
+    let police_grid = url.searchParams.get('police_grid');
+    let neighborhood_number = url.searchParams.get('neighborhood_number');
+    let block = url.searchParams.get('block');
     
-    db.run("INSERT INTO incidents(case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [url.searchParams.get('case_number'), url.searchParams.get('date') + "T" + url.searchParams.get('time'), parseInt(url.searchParams.get('code')), url.searchParams.get('incident'), parseInt(url.searchParams.get('police_grid')), parseInt(url.searchParams.get('neighborhood_number')), url.searchParams.get('block')], (err) => {
-            if (err) {
-                console.log(err);
+    if(case_number == null || date == null || time == null || code == null || incident == null || police_grid == null || neighborhood_number == null || block == null){
+        res.status(500).type('txt').send('Error: Malformed request - must include all parameters: case_number, date, time, code, incident, police_grid, neighborhood_number, block');
+        console.log('Failure: /new-incident: Malformed request');
+    }
+    else{
+        console.log('/new-incident: ' + case_number + ', ' + date + ', ' + time + ', ' + code + ', ' + incident + ', ' + police_grid + ', ' + neighborhood_number + ', ' + block);
+        query = "SELECT case_number FROM incidents WHERE case_number = ?;";
+        db.all(query, case_number, (err, rows) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
             }
-        }
-    )
-    //console.log(query);
-    //db.run(query);
-    console.log(newJSON);
-
-    res.status(200).type('txt').send('success');
+            else{
+                if(rows.length > 0){
+                    res.status(500).type('txt').send('Error: Case number already exists in database: ' + case_number);
+                    console.log('Failure: /new-incident: Case number already exists - case_number: ' + case_number);
+                    res.end();
+                }
+                else{
+                    // Begin to add to db
+                    let date_time = date + "T" + time;
+                    let query = "INSERT INTO incidents(case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    let params = [case_number, date_time, code, incident, police_grid, neighborhood_number, block];
+                    let promise = databaseInsert(query, params);
+                    promise.then(() => {
+                        res.status(200).type('txt').send('success');
+                        console.log("/new-incident: Added successfully");
+                    }).catch((err) => {
+                        res.status(500).type('txt').send('Database access error');
+                        console.log("Error: /new-incident not successful: " + err.message);
+                    })
+                }
+            }
+        })
+    }
 });
+
+// For testing purposes. Not part of the assignment, but we can probably leave it here.
+app.delete('/remove-incident', (req, res) => {
+    let url = new URL(req.protocol + "://" + req.get('host') + req.originalUrl);
+    let case_number = url.searchParams.get('case_number');
+  
+    if(case_number == null){
+      res.status(500).type('txt').send('Error: Malformed request - must specify case_number');
+      console.log('Failure: /remove-user: Malformed request');
+    }
+    else{
+  
+      console.log("Attempting to remove case_number " + case_number);
+      let query = "DELETE FROM incidents WHERE case_number = ?;"
+      let params = case_number;
+      db.all(query, params, (err) => {
+        if(err){
+            res.status(500).send('Database access error');
+            console.log("Error ", err.message);   
+        }
+        else{
+            res.status(200).type('txt').send('success');
+            console.log("/remove-incident: Successfully removed case_number: " + case_number);
+        }
+      })
+    }
+  });
 
 
 // Create Promise for SQLite3 database SELECT query 
