@@ -96,6 +96,10 @@ app.put('/new-incident', (req, res) => {
         res.status(500).type('txt').send('Error: Malformed request - must include all parameters: case_number, date, time, code, incident, police_grid, neighborhood_number, block');
         console.log('Failure: /new-incident: Malformed request');
     }
+    else if(isNaN(Date.parse(date + " " + time))){
+        res.status(500).type('txt').send('Error: Invalid date' + date + " " + time);
+        console.log('Failure: invalid date: ' + date + " " + time);
+    }
     else{
         console.log('/new-incident: ' + case_number + ', ' + date + ', ' + time + ', ' + code + ', ' + incident + ', ' + police_grid + ', ' + neighborhood_number + ', ' + block);
         query = "SELECT case_number FROM incidents WHERE case_number = ?;";
