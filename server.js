@@ -31,18 +31,48 @@ app.use(express.static(public_dir));
 // Respond with list of codes and their corresponding incident type
 app.get('/codes', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-    console.log("/codes: request");
+    console.log(url.searchParams.get('code'));
 
-    let query = "SELECT * FROM codes ORDER BY code;";
-    db.all(query, [], (err, rows) => {
-        if(err){
-            res.status(500).send('Database access error');
-            console.log("Error ", err.message);   
+    if (url.searchParams.get('code') == undefined) {
+        let query = "SELECT * FROM codes ORDER BY code;";
+        db.all(query, [], (err, rows) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
+            }
+            else{
+                res.status(200).type('json').send(rows);
+            }
+        })
+    }
+    else {
+        let params = url.searchParams.get('code').split(',');
+        console.log(params);
+
+        let query = "SELECT * FROM codes ";
+        if (params.length > 0) {
+            query = query + "WHERE ";
+            for (var i = 0; i < params.length; i++) {
+                if (i < params.length-1) {
+                    query = query + "code = ? OR ";
+                } else {
+                    query = query + "code = ? "
+                }
+
+            }
         }
-        else{
-            res.status(200).type('json').send({rows});
-        }
-    })
+        query = query + "ORDER BY code;";
+        console.log(query);
+        db.all(query, params, (err, rows) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
+            }
+            else{
+                res.status(200).type('json').send(rows);
+            }
+        })
+    }
 });
 
 // REST API: GET /neighborhoods
@@ -50,33 +80,192 @@ app.get('/codes', (req, res) => {
 app.get('/neighborhoods', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
-    let query = "SELECT * FROM neighborhoods ORDER BY neighborhood_number;";
-    db.all(query, [], (err, rows) => {
-        if(err){
-            res.status(500).send('Database access error');
-            console.log("Error ", err.message);   
+    if (url.searchParams.get('id') == undefined) {
+        let query = "SELECT * FROM neighborhoods ORDER BY neighborhood_number;";
+        db.all(query, [], (err, rows) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
+            }
+            else{
+                res.status(200).type('json').send(rows);
+            }
+        })
+    } 
+    else {
+        let params = url.searchParams.get('id').split(',');
+        console.log(params);
+
+        let query = "SELECT * FROM neighborhoods ";
+        if (params.length > 0) {
+            query = query + "WHERE ";
+            for (var i = 0; i < params.length; i++) {
+                if (i < params.length-1) {
+                    query = query + "neighborhood_number = ? OR ";
+                } else {
+                    query = query + "neighborhood_number = ? "
+                }
+
+            }
         }
-        else{
-            res.status(200).type('json').send(rows);
-        }
-    })
+        query = query + "ORDER BY neighborhood_number;";
+        console.log(query);
+        db.all(query, params, (err, rows) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
+            }
+            else{
+                res.status(200).type('json').send(rows);
+            }
+        })
+    }
 });
 
 // REST API: GET/incidents
 // Respond with list of crime incidents
 app.get('/incidents', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+    let numberOfParams = 0;
+    let limit = 1000;
+    let codeParams = url.searchParams.get('code');
+    let gridParams = url.searchParams.get('grid');
+    let neighborhoodParams = url.searchParams.get('neighborhood');
+    let startDateParams = url.searchParams.get('start_date');
+    let endDateParams = url.searchParams.get('end_date');
+    let numCodeParams = 0;
+    let numGridParams = 0;
+    let numNeighborhoodParams = 0;
+    let numStartDateParams = 0;
+    let numEndDateParams = 0;
+    let numParamsUsed = 0;
+    let params = [];
 
-    let query = "SELECT * FROM incidents ORDER BY date_time LIMIT 1000;";
-    db.all(query, [], (err, rows) => {
+    if (url.searchParams.get('limit') != null) {
+        limit = url.searchParams.get('limit');
+    }
+    if (codeParams != null) {
+        var codeParamsParts = codeParams.split(',');
+        var codeParamsPartsInt = codeParamsParts.map(Number)
+        numCodeParams = codeParamsParts.length;
+    }
+    if (gridParams != null) {
+        var gridParamsParts = gridParams.split(',');
+        var gridParamsPartsInt = gridParamsParts.map(Number);
+        numGridParams = gridParamsParts.length;
+    }
+    if (neighborhoodParams != null) {
+        var neighborhoodParamsParts = neighborhoodParams.split(',');
+        var neighborhoodParamsPartsInt = neighborhoodParamsParts.map(Number);
+        numNeighborhoodParams = neighborhoodParamsParts.length;
+    }
+    if (startDateParams != null) {
+        numStartDateParams = startDateParams.length;
+    }
+    if (endDateParams != null) {
+        numEndDateParams = endDateParams.length;
+    }
+
+    numberOfParams = numCodeParams + numGridParams + numNeighborhoodParams + numStartDateParams + numEndDateParams;
+    console.log(numStartDateParams);
+    console.log(numEndDateParams);
+    console.log(numberOfParams);
+
+    let query = "SELECT * FROM incidents "
+    if (numberOfParams > 0) {
+        query = query + "WHERE ("
+        if (numCodeParams > 0) {
+            query = query + "code = "
+            for (var i = 0; i < numCodeParams; i++) {
+                params.push(codeParamsPartsInt[i]);
+                if (i != numCodeParams-1) {
+                    query = query + "? OR code = "
+                } else {
+                    query = query + "?) "
+                }
+            }
+            numParamsUsed = numParamsUsed + numCodeParams;
+        }
+    }
+    if (numParamsUsed > 0 && numParamsUsed < numberOfParams && numGridParams > 0) {
+        query = query + "AND (";
+    }
+    if (numberOfParams > 0) {
+        if (numParamsUsed == 0) {
+            query = query + "WHERE "
+        }
+        if (numGridParams > 0) {
+            query = query + "police_grid = "
+            for (var i = 0; i < numGridParams; i++) {
+                params.push(gridParamsPartsInt[i]);
+                if (i != numGridParams-1) {
+                    query = query + "? OR police_grid = "
+                } else {
+                    query = query + "?) "
+                }
+            }
+            numParamsUsed = numParamsUsed + numGridParams;
+        }
+    }
+    if (numParamsUsed > 0 && numParamsUsed < numberOfParams && numNeighborhoodParams > 0) {
+        query = query + "AND (";
+    }
+    if (numberOfParams > 0) {
+        if (numParamsUsed == 0) {
+            query = query + "WHERE "
+        }
+        if (numNeighborhoodParams > 0) {
+            query = query + "neighborhood_number = "
+            for (var i = 0; i < numNeighborhoodParams; i++) {
+                params.push(neighborhoodParamsPartsInt[i]);
+                if (i != numNeighborhoodParams-1) {
+                    query = query + "? OR neighborhood_number = "
+                } else {
+                    query = query + "?) "
+                }
+            }
+            numParamsUsed = numParamsUsed + numGridParams;
+        }
+    }
+    if (numParamsUsed > 0 && numParamsUsed < numberOfParams && numStartDateParams > 0 || numEndDateParams > 0) {
+        query = query + "AND (";
+    }
+    if (numberOfParams > 0) {
+        if (numParamsUsed == 0) {
+            query = query + "WHERE "
+        }
+        if (numStartDateParams > 0 && numEndDateParams > 0) {
+            query = query + "date_time >= " + "?" + " AND " + "date_time <= " + "?" + ") ";
+            numParamsUsed = numParamsUsed + numStartDateParams + numEndDateParams;
+            params.push(url.searchParams.get('start_date') +"'%'");
+            params.push(url.searchParams.get('end_date'));
+        } else if (numStartDateParams > 0) {
+            query = query + "date_time >= " + "?)";
+            numParamsUsed = numParamsUsed + numStartDateParams;
+            params.push(url.searchParams.get('start_date') + "'%'");
+        } else if (numEndDateParams > 0) {
+            query = query + "date_time <= " + "?)";
+            params.push(url.searchParams.get('end_date') + "'%'");
+        }
+    }
+    query = query + "ORDER BY date_time LIMIT ?";
+    console.log(query);
+    console.log("code: " + codeParamsPartsInt);
+    console.log("grid: " + gridParamsPartsInt);
+    console.log("neighbor: " + neighborhoodParamsPartsInt);
+    params.push(limit);
+    console.log("params: " + params);
+
+    db.all(query, params, (err, rows) => {
         if(err){
             res.status(500).send('Database access error');
-            console.log("Error ", err.message);   
+            console.log("Error ", err.message);
         }
         else{
             res.status(200).type('json').send(rows);
         }
     })
+    
 });
 
 // REST API: PUT /new-incident
@@ -154,7 +343,7 @@ app.delete('/remove-incident', (req, res) => {
         }
       })
     }
-  });
+});
 
 
 // Create Promise for SQLite3 database SELECT query 
