@@ -92,7 +92,6 @@ app.put('/new-incident', (req, res) => {
         "neighborhood_number": 7,
         "block": "THOMAS AV & VICTORIA"
     }
-    //newIncidents.push(newJSON);
 
     newJSON.case_number = url.searchParams.get('case_number');
     newJSON.date_time = url.searchParams.get('date') + "T" + url.searchParams.get('time');
@@ -102,16 +101,13 @@ app.put('/new-incident', (req, res) => {
     newJSON.neighborhood_number = parseInt(url.searchParams.get('neighborhood_number'));
     newJSON.block = url.searchParams.get('block');
     
-    db.run("INSERT INTO incidents VALUES (:case_number, :date_time, :code, :incident, :police_grid, :neighborhood_number, :block)",
-            {
-                'case_number': url.searchParams.get('case_number'),
-                'date_time': url.searchParams.get('date') + "T" + url.searchParams.get('time'),
-                'code': parseInt(url.searchParams.get('code')),
-                'incident': url.searchParams.get('incident'),
-                'police_grid': parseInt(url.searchParams.get('police_grid')),
-                'neighborhood_number': parseInt(url.searchParams.get('neighborhood_number')),
-                'block': url.searchParams.get('block')
-            })
+    db.run("INSERT INTO incidents(case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [url.searchParams.get('case_number'), url.searchParams.get('date') + "T" + url.searchParams.get('time'), parseInt(url.searchParams.get('code')), url.searchParams.get('incident'), parseInt(url.searchParams.get('police_grid')), parseInt(url.searchParams.get('neighborhood_number')), url.searchParams.get('block')], (err) => {
+            if (err) {
+                console.log(err);
+            }
+        }
+    )
     //console.log(query);
     //db.run(query);
     console.log(newJSON);
