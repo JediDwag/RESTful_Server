@@ -66,7 +66,7 @@ app.get('/neighborhoods', (req, res) => {
 app.get('/incidents', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
-    let query = "SELECT * FROM incidents ORDER BY date_time;";
+    let query = "SELECT * FROM incidents ORDER BY date_time LIMIT 1000;";
     db.all(query, [], (err, rows) => {
         if(err){
             res.status(500).send('Database access error');
