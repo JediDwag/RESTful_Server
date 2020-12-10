@@ -171,17 +171,17 @@ app.get('/incidents', (req, res) => {
     console.log(numEndDateParams);
     console.log(numberOfParams);
 
-    let query = "SELECT * FROM incidents "
+    let query = "SELECT * FROM incidents ";
     if (numberOfParams > 0) {
-        query = query + "WHERE ("
         if (numCodeParams > 0) {
-            query = query + "code = "
+            query = query + "WHERE (";
+            query = query + "code = ";
             for (var i = 0; i < numCodeParams; i++) {
                 params.push(codeParamsPartsInt[i]);
                 if (i != numCodeParams-1) {
-                    query = query + "? OR code = "
+                    query = query + "? OR code = ";
                 } else {
-                    query = query + "?) "
+                    query = query + "?) ";
                 }
             }
             numParamsUsed = numParamsUsed + numCodeParams;
@@ -192,10 +192,13 @@ app.get('/incidents', (req, res) => {
     }
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
-            query = query + "WHERE "
+            if (numGridParams > 0) {
+                console.log("GRID");
+                query = query + "WHERE (";
+            }
         }
         if (numGridParams > 0) {
-            query = query + "police_grid = "
+            query = query + "police_grid = ";
             for (var i = 0; i < numGridParams; i++) {
                 params.push(gridParamsPartsInt[i]);
                 if (i != numGridParams-1) {
@@ -212,16 +215,19 @@ app.get('/incidents', (req, res) => {
     }
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
-            query = query + "WHERE "
+            if (numNeighborhoodParams > 0) {
+                console.log("NEIGHBOR");
+                query = query + "WHERE (";
+            }
         }
         if (numNeighborhoodParams > 0) {
-            query = query + "neighborhood_number = "
+            query = query + "neighborhood_number = ";
             for (var i = 0; i < numNeighborhoodParams; i++) {
                 params.push(neighborhoodParamsPartsInt[i]);
                 if (i != numNeighborhoodParams-1) {
-                    query = query + "? OR neighborhood_number = "
+                    query = query + "? OR neighborhood_number = ";
                 } else {
-                    query = query + "?) "
+                    query = query + "?) ";
                 }
             }
             numParamsUsed = numParamsUsed + numGridParams;
@@ -232,7 +238,10 @@ app.get('/incidents', (req, res) => {
     }
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
-            query = query + "WHERE "
+            if (numStartDateParams > 0 || numEndDateParams > 0) {
+                console.log("HERE");
+                query = query + "WHERE (";
+            }
         }
         if (numStartDateParams > 0 && numEndDateParams > 0) {
             query = query + "date_time >= " + "?" + " AND " + "date_time <= " + "?" + ") ";
