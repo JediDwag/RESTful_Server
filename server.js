@@ -246,15 +246,15 @@ app.get('/incidents', (req, res) => {
         if (numStartDateParams > 0 && numEndDateParams > 0) {
             query = query + "date_time >= " + "?" + " AND " + "date_time <= " + "?" + ") ";
             numParamsUsed = numParamsUsed + numStartDateParams + numEndDateParams;
-            params.push(url.searchParams.get('start_date') +"'%'");
-            params.push(url.searchParams.get('end_date'));
+            params.push(url.searchParams.get('start_date') +"%");
+            params.push(url.searchParams.get('end_date') + "T23:59:59");
         } else if (numStartDateParams > 0) {
             query = query + "date_time >= " + "?)";
             numParamsUsed = numParamsUsed + numStartDateParams;
-            params.push(url.searchParams.get('start_date') + "'%'");
+            params.push(url.searchParams.get('start_date') + "%");
         } else if (numEndDateParams > 0) {
             query = query + "date_time <= " + "?)";
-            params.push(url.searchParams.get('end_date') + "'%'");
+            params.push(url.searchParams.get('end_date') + "T23:59:59");
         }
     }
     query = query + "ORDER BY date_time LIMIT ?";
