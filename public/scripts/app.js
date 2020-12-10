@@ -61,6 +61,9 @@ function init() {
     }).catch((error) => {
         console.log('Error:', error);
     });
+
+    var search = document.getElementById("searchbtn");
+    search.addEventListener("click", searchLocation, false);
 }
 
 function getJSON(url) {
@@ -75,5 +78,19 @@ function getJSON(url) {
                 reject({status: status.status, message: status.statusText});
             }
         });
+    });
+}
+
+function searchLocation(event) {
+    var loc = document.getElementById("location");
+    var url = "https://nominatim.openstreetmap.org/search?q=" + loc.value + "&format=json&accept-language=en";
+
+    Promise.all([getJSON(url)]).then((results) => {
+        console.log(results[0][0]);
+        map.setView([results[0][0].lat, results[0][0].lon], 14);
+        var names = results[0][0].display_name.split(",");
+        loc.placeholder = names[0] + "," + names[2];
+    }).catch((error) => {
+        console.log(error);
     });
 }
