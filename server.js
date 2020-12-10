@@ -233,7 +233,7 @@ app.get('/incidents', (req, res) => {
             numParamsUsed = numParamsUsed + numGridParams;
         }
     }
-    if (numParamsUsed > 0 && numParamsUsed < numberOfParams && numStartDateParams > 0 || numEndDateParams > 0) {
+    if (numParamsUsed > 0 && numParamsUsed < numberOfParams && (numStartDateParams > 0 || numEndDateParams > 0)) {
         query = query + "AND (";
     }
     if (numberOfParams > 0) {
