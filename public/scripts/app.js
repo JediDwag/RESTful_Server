@@ -83,11 +83,11 @@ function getJSON(url) {
 
 function searchLocation(event) {
     var loc = document.getElementById("location");
-    var url = "https://nominatim.openstreetmap.org/search?q=" + loc.value + "&format=json&accept-language=en";
-
+    var url = "https://nominatim.openstreetmap.org/search?q=" + loc.value + "&viewbox=-93.217977,44.883658,-92.993787,45.008206&bounded=1&format=json&accept-language=en";
+    console.log(url);
     Promise.all([getJSON(url)]).then((results) => {
         console.log(results[0][0]);
-        map.setView([results[0][0].lat, results[0][0].lon], 14);
+        map.setView([results[0][0].lat, results[0][0].lon], 16);
         var names = results[0][0].display_name.split(",");
         loc.placeholder = names[0] + "," + names[2];
     }).catch((error) => {
