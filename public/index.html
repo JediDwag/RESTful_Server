@@ -40,6 +40,35 @@
             <p>Location: <input id="location" type="text" placeholder="enter location"/>
             <button id="searchbtn" type="button">Go</button></p>
         </div>
+        <br>
+        <div id="table">
+            <table class="scrollable">
+                <thead>
+                  <tr>
+                    <th>Case Number</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Incident Type</th>
+                    <th>Incident</th>
+                    <th>Police Grid</th>
+                    <th>Neighborhood</th>
+                    <th>Block</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in rows">
+                    <td>{{row.case_number}}</td>
+                    <td>{{row.date}}</td>
+                    <td>{{row.time}}</td>
+                    <td>{{row.incident_type}}</td>
+                    <td>{{row.incident}}</td>
+                    <td>{{row.police_grid}}</td>
+                    <td>{{row.neighborhood}}</td>
+                    <td>{{row.block}}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
     </div>
 </body>
 </html>

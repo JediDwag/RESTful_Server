@@ -64,6 +64,16 @@ function init() {
 
     var search = document.getElementById("searchbtn");
     search.addEventListener("click", searchLocation, false);
+
+    var table = new Vue({
+        el: '#table',
+        data: {
+          rows: [
+            { case_number: 1, date: "2014-08-14", time: "00:00:00", incident_type: "Murder", incident: "Murder", police_grid: 33, neighborhood: "Payne/Phalen", block: "132X WESTMINSTER ST"},
+            { case_number: 2, date: "2014-08-16", time: "00:00:00", incident_type: "Murder", incident: "Murder", police_grid: 33, neighborhood: "Payne/Phalen", block: "132X WESTMINSTER ST"}
+          ]
+        }
+      });
 }
 
 function getJSON(url) {
