@@ -1,5 +1,7 @@
 let app;
 let map;
+var incident_from_part;
+var neighborhood_from_number;
 let neighborhood_markers = 
 [
     {location: [44.942068, -93.020521], marker: null},
@@ -65,19 +67,51 @@ function init() {
     var search = document.getElementById("searchbtn");
     search.addEventListener("click", searchLocation, false);
 
-    fetch('http://localhost:8000/incidents')
-    .then(response => response.json())
-    .catch(console.log('here1'))
+    getJSON('http://localhost:8000/incidents')
+    //.then(response => response.json())
     //.then(data => console.log(data))
     .then(data => pushTableData(data))
-    .catch(console.log('here2'));
     //console.log(tableData);
 
 }
 
+function setNeighborhood(neighborPair) {
+    window.neighborhood_from_number = neighborPair[0].neighborhood_name;
+}
+
+function setIncidentType(codePair) {
+    window.incident_from_part = codePair[0].incident_type;
+}
+
+function condenseAndPush(thisData, date_part, time_part, table) {
+    //console.log('http://localhost:8000/codes?code=' + thisData.code);
+    getJSON('http://localhost:8000/codes?code=' + thisData.code)
+    //.then(response => response.json())
+    //.then(data => console.log(data))
+    .then(data => setIncidentType(data))
+    getJSON('http://localhost:8000/neighborhoods?id=' + thisData.neighborhood_number)
+    //.then(response => response.json())
+    //.then(data => console.log(data))
+    .then(data => setNeighborhood(data))
+    .then(function() {
+        var newData = {
+            case_number: thisData.case_number,
+            date: date_part,
+            time: time_part,
+            incident_type: window.incident_from_part,
+            incident: thisData.incident,
+            police_grid: thisData.police_grid,
+            neighborhood: window.neighborhood_from_number,
+            block: thisData.block
+        }
+        //console.log(thisData);
+        table.rows.push(newData);
+    })
+}
+
 function pushTableData(currentData) {
 
-    let table = new Vue({
+    var table = new Vue({
         el: '#table',
         data: {
           rows: [
@@ -86,42 +120,16 @@ function pushTableData(currentData) {
           ]
         }
     });
-    let thisData;
+    var thisData;
     for (var i = 0; i < currentData.length; i++) {
         thisData = currentData[i];
-        var thisCode;
         var date_time_string = JSON.stringify(thisData.date_time);
         var date_part = date_time_string.split('T')[0];
         date_part = date_part.substr(1, date_part.length);
         var time_part = date_time_string.split('T')[1];
         time_part = time_part.substr(0, time_part.length-1);
 
-        /*
-        let query1 = 'SELECT * FROM codes WHERE code = ?';
-        db.all(query1, [thisData.code], (err, rows) => {
-            if(err){
-                res.status(500).send('Database access error');
-                console.log("Error ", err.message);   
-            }
-            else{
-                thisCode = rows[0].incident_type;
-                //res.status(200).type('json').send(rows);
-            }
-        })
-        */
-
-        var newData = {
-            case_number: thisData.case_number,
-            date: date_part,
-            time: time_part,
-            incident_type: thisData.code,
-            incident: thisData.incident,
-            police_grid: thisData.police_grid,
-            neighborhood: thisData.neighborhood_number,
-            block: thisData.block
-        }
-        //console.log(thisData);
-        table.rows.push(newData);
+        condenseAndPush(thisData, date_part, time_part, table);
     }
 }
 
