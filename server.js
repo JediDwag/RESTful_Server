@@ -257,7 +257,7 @@ app.get('/incidents', (req, res) => {
             params.push(url.searchParams.get('end_date') + "T23:59:59");
         }
     }
-    query = query + "ORDER BY date_time LIMIT ?";
+    query = query + "ORDER BY date_time DESC LIMIT ?";
     console.log(query);
     console.log("code: " + codeParamsPartsInt);
     console.log("grid: " + gridParamsPartsInt);

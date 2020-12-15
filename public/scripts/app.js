@@ -4,23 +4,23 @@ var incident_from_part;
 var neighborhood_from_number;
 let neighborhood_markers = 
 [
-    {location: [44.942068, -93.020521], marker: null},
-    {location: [44.977413, -93.025156], marker: null},
-    {location: [44.931244, -93.079578], marker: null},
-    {location: [44.956192, -93.060189], marker: null},
-    {location: [44.978883, -93.068163], marker: null},
-    {location: [44.975766, -93.113887], marker: null},
-    {location: [44.959639, -93.121271], marker: null},
-    {location: [44.947700, -93.128505], marker: null},
-    {location: [44.930276, -93.119911], marker: null},
-    {location: [44.982752, -93.147910], marker: null},
-    {location: [44.963631, -93.167548], marker: null},
-    {location: [44.973971, -93.197965], marker: null},
-    {location: [44.949043, -93.178261], marker: null},
-    {location: [44.934848, -93.176736], marker: null},
-    {location: [44.913106, -93.170779], marker: null},
-    {location: [44.937705, -93.136997], marker: null},
-    {location: [44.949203, -93.093739], marker: null}
+    {location: [44.942068, -93.020521], marker: 1},
+    {location: [44.977413, -93.025156], marker: 2},
+    {location: [44.931244, -93.079578], marker: 3},
+    {location: [44.956192, -93.060189], marker: 4},
+    {location: [44.978883, -93.068163], marker: 5},
+    {location: [44.975766, -93.113887], marker: 6},
+    {location: [44.959639, -93.121271], marker: 7},
+    {location: [44.947700, -93.128505], marker: 8},
+    {location: [44.930276, -93.119911], marker: 9},
+    {location: [44.982752, -93.147910], marker: 10},
+    {location: [44.963631, -93.167548], marker: 11},
+    {location: [44.973971, -93.197965], marker: 12},
+    {location: [44.949043, -93.178261], marker: 13},
+    {location: [44.934848, -93.176736], marker: 14},
+    {location: [44.913106, -93.170779], marker: 15},
+    {location: [44.937705, -93.136997], marker: 16},
+    {location: [44.949203, -93.093739], marker: 17}
 ];
 
 function init() {
@@ -78,11 +78,38 @@ function init() {
     })
 
     getJSON('http://localhost:8000/incidents')
-    //.then(response => response.json())
-    //.then(data => console.log(data))
-    .then(data => pushTableData(data))
-    //console.log(tableData);
+    .then((data) => {
+        pushTableData(data)
+        getJSON('http://localhost:8000/neighborhoods').then((values) => {
+            console.log(values);
+            for(i in neighborhood_markers){
+                L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
+                .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
+            }
+        })
+    })
+}
 
+function getCrimes(hoodNumber, data){
+    answer = 0;
+    for(i in data){
+        if(data[i].neighborhood_number == hoodNumber){
+            answer++;
+        }
+    }
+    console.log(answer);
+    return answer;
+}
+
+function getHoodName(hoodNumber, values){
+    answer = "Name not found";
+    for(i in values){
+        if(values[i].neighborhood_number == hoodNumber){
+            answer = values[i].neighborhood_name;
+            break;
+        }  
+    }
+    return answer;
 }
 
 function setNeighborhood(neighborPair) {
