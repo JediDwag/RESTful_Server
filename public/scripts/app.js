@@ -69,7 +69,7 @@ function init() {
     search.addEventListener("click", searchLocation, false);
 
     new Vue({
-        el:'#search',
+        el:'#searchBox',
       methods:{
         enterPressed () {
             searchLocation();
