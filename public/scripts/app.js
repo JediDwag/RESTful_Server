@@ -83,30 +83,34 @@ function setIncidentType(codePair) {
     window.incident_from_part = codePair[0].incident_type;
 }
 
-function condenseAndPush(thisData, date_part, time_part, table) {
-    //console.log('http://localhost:8000/codes?code=' + thisData.code);
-    getJSON('http://localhost:8000/codes?code=' + thisData.code)
-    //.then(response => response.json())
-    //.then(data => console.log(data))
-    .then(data => setIncidentType(data))
-    getJSON('http://localhost:8000/neighborhoods?id=' + thisData.neighborhood_number)
-    //.then(response => response.json())
-    //.then(data => console.log(data))
-    .then(data => setNeighborhood(data))
-    .then(function() {
-        var newData = {
-            case_number: thisData.case_number,
-            date: date_part,
-            time: time_part,
-            incident_type: window.incident_from_part,
-            incident: thisData.incident,
-            police_grid: thisData.police_grid,
-            neighborhood: window.neighborhood_from_number,
-            block: thisData.block
+function condenseAndPush(thisData, date_part, time_part, table, codes, neighborhoods) {
+
+    for(line in codes){
+        if(codes[line].code == thisData.code){
+            window.incident_from_part = codes[line].code;
+            break;
         }
-        //console.log(thisData);
-        table.rows.push(newData);
-    })
+    }
+
+    for(line in neighborhoods){
+        if(neighborhoods[line].neighborhood_number == thisData.neighborhood_number){
+            window.neighborhood_from_number = neighborhoods[line].neighborhood_number;
+            break;
+        }
+    }
+
+    var newData = {
+        case_number: thisData.case_number,
+        date: date_part,
+        time: time_part,
+        incident_type: window.incident_from_part,
+        incident: thisData.incident,
+        police_grid: thisData.police_grid,
+        neighborhood: window.neighborhood_from_number,
+        block: thisData.block
+    }
+
+    table.rows.push(newData);
 }
 
 function pushTableData(currentData) {
@@ -114,23 +118,27 @@ function pushTableData(currentData) {
     var table = new Vue({
         el: '#table',
         data: {
-          rows: [
-            { case_number: 1, date: "2014-08-14", time: "00:00:00", incident_type: "Murder", incident: "Murder", police_grid: 33, neighborhood: "Payne/Phalen", block: "132X WESTMINSTER ST"},
-            { case_number: 2, date: "2014-08-16", time: "00:00:00", incident_type: "Murder", incident: "Murder", police_grid: 33, neighborhood: "Payne/Phalen", block: "132X WESTMINSTER ST"}
-          ]
+          rows: []
         }
     });
-    var thisData;
-    for (var i = 0; i < currentData.length; i++) {
-        thisData = currentData[i];
-        var date_time_string = JSON.stringify(thisData.date_time);
-        var date_part = date_time_string.split('T')[0];
-        date_part = date_part.substr(1, date_part.length);
-        var time_part = date_time_string.split('T')[1];
-        time_part = time_part.substr(0, time_part.length-1);
 
-        condenseAndPush(thisData, date_part, time_part, table);
-    }
+    Promise.all([getJSON('http://localhost:8000/codes'), getJSON('http://localhost:8000/neighborhoods')]).then((values) => {
+
+        var codes = values[0];
+        var neighborhoods = values[1];
+        var thisData;
+
+        for (var i = 0; i < currentData.length; i++) {
+            thisData = currentData[i];
+            var date_time_string = JSON.stringify(thisData.date_time);
+            var date_part = date_time_string.split('T')[0];
+            date_part = date_part.substr(1, date_part.length);
+            var time_part = date_time_string.split('T')[1];
+            time_part = time_part.substr(0, time_part.length-1);
+
+            condenseAndPush(thisData, date_part, time_part, table, codes, neighborhoods);
+        }
+    });
 }
 
 function getJSON(url) {

@@ -160,7 +160,7 @@ th {
     z-index: 2;
 }
 .scrollable td:first-of-type {
-    background: lightblue;
+    background: lightskyblue;
     color: white;
     z-index: 1;
 }
