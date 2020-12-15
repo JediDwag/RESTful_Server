@@ -20,6 +20,7 @@
 }
 body
 {
+    background-color: lightgray;
     margin: 0;
     padding: 0;
 }
@@ -47,33 +48,9 @@ body
   
   /* Add a color to the active/current link */
   .topnav a.active {
-    background-color: #4CAF50;
+    background-color: #3399ff;
     color: white;
   }
-
-table {  
-    color: #333;
-    font-family: Helvetica, Arial, sans-serif;
-    width: 800px; 
-    border-collapse: 
-    collapse; border-spacing: 0; 
-}
-
-td, thead {  
-    border: 1px solid transparent; /* No more visible border */
-    height: 30px; 
-    transition: all 0.3s;  /* Simple transition for hover effect */
-}
-
-thead {  
-    background: #DFDFDF;  /* Darken header a bit */
-    font-weight: bold;
-}
-
-td {  
-    background: #FAFAFA;
-    text-align: center;
-}
 
 /* Cells in even rows (2,4,6...) are one color */        
 tr:nth-child(even) td { background: #F1F1F1; }   
@@ -160,7 +137,7 @@ th {
     z-index: 2;
 }
 .scrollable td:first-of-type {
-    background: lightskyblue;
+    background: #3399ff;
     color: white;
     z-index: 1;
 }
