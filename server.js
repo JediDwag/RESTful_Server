@@ -341,20 +341,19 @@ app.delete('/remove-incident', (req, res) => {
       console.log('Failure: /remove-user: Malformed request');
     }
     else{
-  
-      console.log("Attempting to remove case_number " + case_number);
-      let query = "DELETE FROM incidents WHERE case_number = ?;"
-      let params = case_number;
-      db.all(query, params, (err) => {
-        if(err){
-            res.status(500).send('Database access error');
-            console.log("Error ", err.message);   
-        }
-        else{
-            res.status(200).type('txt').send('success');
-            console.log("/remove-incident: Successfully removed case_number: " + case_number);
-        }
-      })
+        console.log("Attempting to remove case_number " + case_number);
+        let query = "DELETE FROM incidents WHERE case_number = ?;"
+        let params = case_number;
+        db.all(query, params, (err) => {
+            if(err){
+                res.status(500).send('Database access error');
+                console.log("Error ", err.message);   
+            }
+            else{
+                res.status(200).type('txt').send('success');
+                console.log("/remove-incident: Successfully removed case_number: " + case_number);
+            }
+        })
     }
 });
 

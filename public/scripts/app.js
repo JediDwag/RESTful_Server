@@ -70,12 +70,12 @@ function init() {
 
     new Vue({
         el:'#search',
-      methods:{
-        enterPressed () {
-            searchLocation();
+        methods: {
+            enterPressed () {
+                searchLocation();
+            }
         }
-      }
-    })
+    });
 
     getJSON('http://localhost:8000/incidents')
     .then((data) => {
@@ -87,7 +87,7 @@ function init() {
                 .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
             }
         })
-    })
+    });
 }
 
 function getCrimes(hoodNumber, data){
@@ -195,8 +195,9 @@ function getJSON(url) {
 
 function searchLocation(event) {
     var loc = document.getElementById("location");
+    console.log("location value: " + loc.value);
     var url = "https://nominatim.openstreetmap.org/search?q=" + loc.value + "&viewbox=-93.217977,44.883658,-92.993787,45.008206&bounded=1&format=json&accept-language=en";
-    console.log(url);
+    console.log("URL: " + url);
     Promise.all([getJSON(url)]).then((results) => {
         console.log(results[0][0]);
         map.setView([results[0][0].lat, results[0][0].lon], 16);
