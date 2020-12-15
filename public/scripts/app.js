@@ -58,6 +58,7 @@ function init() {
     getJSON('data/StPaulDistrictCouncil.geojson').then((result) => {
         // St. Paul GeoJSON
         $(result.features).each(function(key, value) {
+            console.log(value);
             district_boundary.addData(value);
         });
     }).catch((error) => {
@@ -66,6 +67,15 @@ function init() {
 
     var search = document.getElementById("searchbtn");
     search.addEventListener("click", searchLocation, false);
+
+    new Vue({
+        el:'#search',
+      methods:{
+        enterPressed () {
+            searchLocation();
+        }
+      }
+    })
 
     getJSON('http://localhost:8000/incidents')
     //.then(response => response.json())
@@ -164,7 +174,7 @@ function searchLocation(event) {
         console.log(results[0][0]);
         map.setView([results[0][0].lat, results[0][0].lon], 16);
         var names = results[0][0].display_name.split(",");
-        loc.placeholder = names[0] + "," + names[2];
+        loc.value = names[0] + "," + names[2];
     }).catch((error) => {
         console.log(error);
     });
