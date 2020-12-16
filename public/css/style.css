@@ -88,6 +88,14 @@ tr td:hover {
     clear: both;
 }
 
+.legend{
+    background-color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    padding-left: 1em;
+}
+
 table, th, td {
     border-collapse: collapse;
 }
