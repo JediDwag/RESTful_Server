@@ -73,6 +73,7 @@ function init() {
         methods: {
             enterPressed () {
                 searchLocation();
+                console.log(map.getBounds());
             }
         }
     });
@@ -81,7 +82,6 @@ function init() {
     .then((data) => {
         pushTableData(data)
         getJSON('http://localhost:8000/neighborhoods').then((values) => {
-            console.log(values);
             for(i in neighborhood_markers){
                 L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
                 .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
@@ -97,7 +97,6 @@ function getCrimes(hoodNumber, data){
             answer++;
         }
     }
-    console.log(answer);
     return answer;
 }
 
@@ -124,14 +123,14 @@ function condenseAndPush(thisData, date_part, time_part, table, codes, neighborh
 
     for(line in codes){
         if(codes[line].code == thisData.code){
-            window.incident_from_part = codes[line].code;
+            window.incident_from_part = codes[line].incident_type;
             break;
         }
     }
 
     for(line in neighborhoods){
         if(neighborhoods[line].neighborhood_number == thisData.neighborhood_number){
-            window.neighborhood_from_number = neighborhoods[line].neighborhood_number;
+            window.neighborhood_from_number = neighborhoods[line].neighborhood_name;
             break;
         }
     }
@@ -144,7 +143,8 @@ function condenseAndPush(thisData, date_part, time_part, table, codes, neighborh
         incident: thisData.incident,
         police_grid: thisData.police_grid,
         neighborhood: window.neighborhood_from_number,
-        block: thisData.block
+        block: thisData.block,
+        code: thisData.code
     }
 
     table.rows.push(newData);
@@ -156,6 +156,33 @@ function pushTableData(currentData) {
         el: '#table',
         data: {
           rows: []
+        },
+        methods: {
+            color: function(type){
+                console.log(type);
+                if((type >= 110 & type <= 220) ||
+                (type >= 400 && type <= 453) ||
+                (type >= 810 && type <= 982)){
+                    return "background: lightcoral";
+                }
+                else if((type >= 300 && type <= 374) ||
+                (type >= 500 && type <= 546) ||
+                (type >= 600 && type <= 613) ||
+                (type >= 621 && type <= 712) ||
+                (type >= 1400 && type <= 1436)){
+                    return "background: lightblue";
+                }
+                else if((type >= 550 && type <= 566) ||
+                (type >= 720 && type <= 722)){
+                    return "background: lightgoldenrodyellow";
+                }
+                else if(type >= 1800 && type <= 1885){
+                    return "background: lightgreen";
+                }
+                else if(type == 614 || type == 2619 || type == 9954 || type == 9959){
+                    return "background: lightsalmon";
+                }
+            }
         }
     });
 

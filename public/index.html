@@ -56,7 +56,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="row in rows">
+                  <tr v-for="row in rows" v-bind:style="color(row.code)">
                     <td>{{row.case_number}}</td>
                     <td>{{row.date}}</td>
                     <td>{{row.time}}</td>
