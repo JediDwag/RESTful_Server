@@ -2,6 +2,14 @@ let app;
 let map;
 var incident_from_part;
 var neighborhood_from_number;
+var redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 let neighborhood_markers = 
 [
     {location: [44.942068, -93.020521], marker: 1},
@@ -87,6 +95,35 @@ function init() {
                 .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
             }
         })
+    });
+}
+
+function myScript(argument, date, time, incident) {
+    let argumentArray = argument.split("");
+    for (var x = 0; x < argument.length; x++)
+    {
+        var c = argument.charAt(x);
+        if (parseInt(argument.charAt(x-1)) != NaN && argument.charAt(x) == "X" && argument.charAt(x+1) == " ") {
+            argumentArray[x] = "0";
+        }
+    }
+    let newArgument = argumentArray.join("");
+    newArgument = newArgument.replace(/ /g, "%20");
+    getJSON("https://nominatim.openstreetmap.org/search?q=" + newArgument + "&viewbox=-93.217977,44.883658,-92.993787,45.008206&bounded=1&format=json&accept-language=en")
+    .then((data) => {
+        currMarker = L.marker([data[0].lat, data[0].lon], {icon: redIcon}).addTo(map)
+        .bindPopup("Date: " + date + "</br>Time: " + time + "</br>Incident: " + incident + "</br><input type='button' value='Delete this marker' class='marker-delete-button'/>");
+        currMarker.on("popupopen", onPopupOpen);
+    });
+}
+
+function onPopupOpen() {
+
+    var tempMarker = this;
+
+    // To remove marker on click of delete button in the popup of marker
+    $(".marker-delete-button:visible").click(function () {
+        map.removeLayer(tempMarker);
     });
 }
 

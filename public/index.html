@@ -63,8 +63,8 @@
                     <th>Block</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr v-for="row in rows" v-bind:style="color(row.code)">
+                <tbody style="cursor:pointer">
+                  <tr v-for="row in rows" v-bind:style="color(row.code)" v-on:click="myScript(row.block, row.date, row.time, row.incident)">
                     <td>{{row.case_number}}</td>
                     <td>{{row.date}}</td>
                     <td>{{row.time}}</td>
