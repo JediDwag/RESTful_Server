@@ -335,6 +335,55 @@ function init() {
         }
     });
 
+    map.on('zoom', function() {
+        let theseBounds = map.getBounds();
+        let north = theseBounds.getNorth();
+        let south = theseBounds.getSouth();
+        let east = theseBounds.getEast();
+        let west = theseBounds.getWest();
+        let neighborhoodsToInclude = [];
+
+        console.log(north)
+        console.log(south)
+        console.log(east)
+        console.log(west)
+
+        table.clear();
+
+        for (var i in neighborhood_markers) {
+            if (neighborhood_markers[i].location[0] <= north && neighborhood_markers[i].location[0] >= south) {
+                if (neighborhood_markers[i].location[1] <= east && neighborhood_markers[i].location[1] >= west) {
+                    console.log(neighborhood_markers[i]);
+                    neighborhoodsToInclude.push(neighborhood_markers[i].marker);
+                }
+            }
+        }
+        
+        let urlString = 'http://localhost:8000/incidents'
+        if (neighborhoodsToInclude.length > 0) {
+            urlString = urlString + '?neighborhood=';
+            for (i in neighborhoodsToInclude) {
+                urlString = urlString + neighborhoodsToInclude[i] + ',';
+            }
+        }
+        urlString = urlString.substring(0, urlString.length - 1);
+        console.log(urlString);
+
+        getJSON(urlString)
+        .then((data) => {
+            pushTableData(data, table)
+            /*
+            getJSON('http://localhost:8000/neighborhoods').then((values) => {
+                for(i in neighborhood_markers){
+                    L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
+                    .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
+                }
+            })
+            */
+        });
+        
+    });
+
     getJSON('http://localhost:8000/incidents')
     .then((data) => {
         pushTableData(data, table)
