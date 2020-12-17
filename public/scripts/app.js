@@ -152,12 +152,188 @@ function init() {
         methods: {
             processForm: function(){
                 table.clear();
-                // The rest of the owl
-                //let filterURL = "http://localhost:8000/incidents";
-                
+                let filterURL = "http://localhost:8000/incidents";
+                let changed = 0;
+                var params = "";
+                if(this.personalCrimes != "" || this.propertyCrimes != "" || this.inchoateCrimes != "" || this.statutoryCrimes != "" || this.otherCrimes != ""){
+                    changed = 1;
+                    params = params + "?code="
+                    if(personalCrimes != ""){
+                        params = params + "110,120,210,220,400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453,810,861,862,863,900,901,903,905,911,915,921,923,931,933,941,942,951,961,971,972,981,982";
+                        if(this.propertyCrimes != "" || this.inchoateCrimes != "" || this.statutoryCrimes != "" || this.otherCrimes != ""){
+                            params = params + ","
+                        }
+                    }
+                    if(this.propertyCrimes != ""){
+                        params = params + "500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,546,600,603,611,612,613,621,622,623,630,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693,700,710,711,712,1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436";
+                        if(this.inchoateCrimes != "" || this.statutoryCrimes != "" || this.otherCrimes != ""){
+                            params = params + ","
+                        }
+                    }
+                    if(this.inchoateCrimes != ""){
+                        params = params + "550,551,553,555,556,560,561,563,565,566,720,721,722";
+                        if(this.statutoryCrimes != "" || this.otherCrimes != ""){
+                            params = params + ","
+                        }
+                    }
+                    if(this.statutoryCrimes != ""){
+                        params = params + "1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885";
+                        if(this.otherCrimes != ""){
+                            params = params + ","
+                        }
+                    }
+                    if(this.otherCrimes != ""){
+                        params = params + "614,2619,9954,9959";
+                    }
+                }
+                if(this.hood1 != "" || this.hood2 != "" || this.hood3 != "" || this.hood4 != "" || this.hood5 != "" || this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                    if(changed != 0){
+                        params = params + "&";
+                    }
+                    else{
+                        params = params + "?";
+                        changed = 1;
+                    }
+                    params = params + "neighborhood=";
+                    if(this.hood1 != ""){
+                        params = params + "1";
+                        if(this.hood2 != "" || this.hood3 != "" || this.hood4 != "" || this.hood5 != "" || this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood2 != ""){
+                        params = params + "2";
+                        if(this.hood3 != "" || this.hood4 != "" || this.hood5 != "" || this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood3 != ""){
+                        params = params + "3";
+                        if(this.hood4 != "" || this.hood5 != "" || this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood4 != ""){
+                        params = params + "4";
+                        if(this.hood5 != "" || this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood5 != ""){
+                        params = params + "5";
+                        if(this.hood6 != "" || this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood6 != ""){
+                        params = params + "6";
+                        if(this.hood7 != "" || this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood7 != ""){
+                        params = params + "7";
+                        if(this.hood8 != "" || this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood8 != ""){
+                        params = params + "8";
+                        if(this.hood9 != "" || this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood9 != ""){
+                        params = params + "9";
+                        if(this.hood10 != "" || this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood10 != ""){
+                        params = params + "10";
+                        if(this.hood11 != "" || this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood11 != ""){
+                        params = params + "11";
+                        if(this.hood12 != "" || this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood12 != ""){
+                        params = params + "12";
+                        if(this.hood13 != "" || this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood13 != ""){
+                        params = params + "13";
+                        if(this.hood14 != "" || this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood14 != ""){
+                        params = params + "14";
+                        if(this.hood15 != "" || this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood15 != ""){
+                        params = params + "15";
+                        if(this.hood16 != "" || this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood16 != ""){
+                        params = params + "16";
+                        if(this.hood17 != ""){
+                            params = params + ",";
+                        }
+                    }
+                    if(this.hood17 != ""){
+                        params = params + "17";
+                    }
+                }
+                if(startDate.value != ""){
+                    if(changed != 0){
+                        params = params + "&";
+                    }
+                    else{
+                        params = params + "?";
+                        changed = 1;
+                    }
+
+                    params = params + "start_date=" + startDate.value;
+                }
+                if(endDate.value != ""){
+                    if(changed != 0){
+                        params = params + "&";
+                    }
+                    else{
+                        params = params + "?";
+                        changed = 1;
+                    }
+                    params = params + "end_date=" + endDate.value;
+                }
+                if(maxIncidents.value != ""){
+                    if(changed != 0){
+                        params = params + "&";
+                    }
+                    else{
+                        params = params + "?";
+                        changed = 1;
+                    }
+                    params = params + "limit=" + maxIncidents.value;
+                }
+
+                filterURL = filterURL + params;
+                getJSON(filterURL).then((data) => {
+                    pushTableData(data, table);
+                });
             }
         }
-    })
+    });
 
     getJSON('http://localhost:8000/incidents')
     .then((data) => {
