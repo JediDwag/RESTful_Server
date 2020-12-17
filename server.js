@@ -31,7 +31,7 @@ app.use(express.static(public_dir));
 // Respond with list of codes and their corresponding incident type
 app.get('/codes', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-    console.log(url.searchParams.get('code'));
+    // console.log(url.searchParams.get('code'));
 
     if (url.searchParams.get('code') == undefined) {
         let query = "SELECT * FROM codes ORDER BY code;";
@@ -47,7 +47,7 @@ app.get('/codes', (req, res) => {
     }
     else {
         let params = url.searchParams.get('code').split(',');
-        console.log(params);
+        // console.log(params);
 
         let query = "SELECT * FROM codes ";
         if (params.length > 0) {
@@ -62,7 +62,7 @@ app.get('/codes', (req, res) => {
             }
         }
         query = query + "ORDER BY code;";
-        console.log(query);
+        // console.log(query);
         db.all(query, params, (err, rows) => {
             if(err){
                 res.status(500).send('Database access error');
@@ -94,7 +94,7 @@ app.get('/neighborhoods', (req, res) => {
     } 
     else {
         let params = url.searchParams.get('id').split(',');
-        console.log(params);
+        // console.log(params);
 
         let query = "SELECT * FROM neighborhoods ";
         if (params.length > 0) {
@@ -109,7 +109,7 @@ app.get('/neighborhoods', (req, res) => {
             }
         }
         query = query + "ORDER BY neighborhood_number;";
-        console.log(query);
+        // console.log(query);
         db.all(query, params, (err, rows) => {
             if(err){
                 res.status(500).send('Database access error');
@@ -167,9 +167,9 @@ app.get('/incidents', (req, res) => {
     }
 
     numberOfParams = numCodeParams + numGridParams + numNeighborhoodParams + numStartDateParams + numEndDateParams;
-    console.log(numStartDateParams);
-    console.log(numEndDateParams);
-    console.log(numberOfParams);
+    // console.log(numStartDateParams);
+    // console.log(numEndDateParams);
+    // console.log(numberOfParams);
 
     let query = "SELECT * FROM incidents ";
     if (numberOfParams > 0) {
@@ -193,7 +193,7 @@ app.get('/incidents', (req, res) => {
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
             if (numGridParams > 0) {
-                console.log("GRID");
+                // console.log("GRID");
                 query = query + "WHERE (";
             }
         }
@@ -216,7 +216,7 @@ app.get('/incidents', (req, res) => {
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
             if (numNeighborhoodParams > 0) {
-                console.log("NEIGHBOR");
+                // console.log("NEIGHBOR");
                 query = query + "WHERE (";
             }
         }
@@ -239,7 +239,7 @@ app.get('/incidents', (req, res) => {
     if (numberOfParams > 0) {
         if (numParamsUsed == 0) {
             if (numStartDateParams > 0 || numEndDateParams > 0) {
-                console.log("HERE");
+                // console.log("HERE");
                 query = query + "WHERE (";
             }
         }
@@ -258,12 +258,12 @@ app.get('/incidents', (req, res) => {
         }
     }
     query = query + "ORDER BY date_time DESC LIMIT ?";
-    console.log(query);
-    console.log("code: " + codeParamsPartsInt);
-    console.log("grid: " + gridParamsPartsInt);
-    console.log("neighbor: " + neighborhoodParamsPartsInt);
+    // console.log(query);
+    // console.log("code: " + codeParamsPartsInt);
+    // console.log("grid: " + gridParamsPartsInt);
+    // console.log("neighbor: " + neighborhoodParamsPartsInt);
     params.push(limit);
-    console.log("params: " + params);
+    // console.log("params: " + params);
 
     db.all(query, params, (err, rows) => {
         if(err){
@@ -299,7 +299,7 @@ app.put('/new-incident', (req, res) => {
         console.log('Failure: invalid date: ' + date + " " + time);
     }
     else{
-        console.log('/new-incident: ' + case_number + ', ' + date + ', ' + time + ', ' + code + ', ' + incident + ', ' + police_grid + ', ' + neighborhood_number + ', ' + block);
+        // console.log('/new-incident: ' + case_number + ', ' + date + ', ' + time + ', ' + code + ', ' + incident + ', ' + police_grid + ', ' + neighborhood_number + ', ' + block);
         query = "SELECT case_number FROM incidents WHERE case_number = ?;";
         db.all(query, case_number, (err, rows) => {
             if(err){
@@ -332,30 +332,30 @@ app.put('/new-incident', (req, res) => {
 });
 
 // For testing purposes. Not part of the assignment, but we can probably leave it here.
-app.delete('/remove-incident', (req, res) => {
-    let url = new URL(req.protocol + "://" + req.get('host') + req.originalUrl);
-    let case_number = url.searchParams.get('case_number');
+// app.delete('/remove-incident', (req, res) => {
+//     let url = new URL(req.protocol + "://" + req.get('host') + req.originalUrl);
+//     let case_number = url.searchParams.get('case_number');
   
-    if(case_number == null){
-      res.status(500).type('txt').send('Error: Malformed request - must specify case_number');
-      console.log('Failure: /remove-user: Malformed request');
-    }
-    else{
-        console.log("Attempting to remove case_number " + case_number);
-        let query = "DELETE FROM incidents WHERE case_number = ?;"
-        let params = case_number;
-        db.all(query, params, (err) => {
-            if(err){
-                res.status(500).send('Database access error');
-                console.log("Error ", err.message);   
-            }
-            else{
-                res.status(200).type('txt').send('success');
-                console.log("/remove-incident: Successfully removed case_number: " + case_number);
-            }
-        })
-    }
-});
+//     if(case_number == null){
+//       res.status(500).type('txt').send('Error: Malformed request - must specify case_number');
+//       console.log('Failure: /remove-user: Malformed request');
+//     }
+//     else{
+//         console.log("Attempting to remove case_number " + case_number);
+//         let query = "DELETE FROM incidents WHERE case_number = ?;"
+//         let params = case_number;
+//         db.all(query, params, (err) => {
+//             if(err){
+//                 res.status(500).send('Database access error');
+//                 console.log("Error ", err.message);   
+//             }
+//             else{
+//                 res.status(200).type('txt').send('success');
+//                 console.log("/remove-incident: Successfully removed case_number: " + case_number);
+//             }
+//         })
+//     }
+// });
 
 
 // Create Promise for SQLite3 database SELECT query 

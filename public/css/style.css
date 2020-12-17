@@ -4,11 +4,14 @@
 }
 
 #site {
-    width: 800px;
+    max-width: 1000px;
+    width: auto;
 }
 
 #leafletmap {
+    margin-top: 20px;
     height: 600px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
 body
@@ -164,6 +167,9 @@ th {
         margin: 10px;
     }
     .scrollable th {
-        padding: 10px;
+        padding: 5px;
+    }
+    tr, td {
+        padding: 5px;
     }
 }

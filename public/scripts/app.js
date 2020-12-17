@@ -31,6 +31,9 @@ let neighborhood_markers =
     {location: [44.949203, -93.093739], marker: 17}
 ];
 
+let lastRequest = "";
+let lastHoods = [];
+
 function init() {
     let crime_url = 'http://localhost:8000';
 
@@ -59,6 +62,7 @@ function init() {
         maxZoom: 18
     }).addTo(map);
     map.setMaxBounds([[44.883658, -93.217977], [45.008206, -92.993787]]);
+    var markerGroup = L.layerGroup().addTo(map);
     
     let district_boundary = new L.geoJson();
     district_boundary.addTo(map);
@@ -152,13 +156,14 @@ function init() {
         methods: {
             processForm: function(){
                 table.clear();
+                console.log(this.personalCrimes);
                 let filterURL = "http://localhost:8000/incidents";
                 let changed = 0;
                 var params = "";
                 if(this.personalCrimes != "" || this.propertyCrimes != "" || this.inchoateCrimes != "" || this.statutoryCrimes != "" || this.otherCrimes != ""){
                     changed = 1;
                     params = params + "?code="
-                    if(personalCrimes != ""){
+                    if(this.personalCrimes != ""){
                         params = params + "110,120,210,220,400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453,810,861,862,863,900,901,903,905,911,915,921,923,931,933,941,942,951,961,971,972,981,982";
                         if(this.propertyCrimes != "" || this.inchoateCrimes != "" || this.statutoryCrimes != "" || this.otherCrimes != ""){
                             params = params + ","
@@ -328,73 +333,90 @@ function init() {
                 }
 
                 filterURL = filterURL + params;
-                getJSON(filterURL).then((data) => {
-                    pushTableData(data, table);
-                });
+                console.log(filterURL);
+                populateMap(filterURL);
             }
         }
     });
 
-    map.on('zoom', function() {
+    function updateTable(){
         let theseBounds = map.getBounds();
         let north = theseBounds.getNorth();
         let south = theseBounds.getSouth();
         let east = theseBounds.getEast();
         let west = theseBounds.getWest();
         let neighborhoodsToInclude = [];
-
-        console.log(north)
-        console.log(south)
-        console.log(east)
-        console.log(west)
-
-        table.clear();
-
+        let same = true;
+    
         for (var i in neighborhood_markers) {
             if (neighborhood_markers[i].location[0] <= north && neighborhood_markers[i].location[0] >= south) {
                 if (neighborhood_markers[i].location[1] <= east && neighborhood_markers[i].location[1] >= west) {
-                    console.log(neighborhood_markers[i]);
                     neighborhoodsToInclude.push(neighborhood_markers[i].marker);
                 }
             }
         }
-        
-        let urlString = 'http://localhost:8000/incidents'
-        if (neighborhoodsToInclude.length > 0) {
-            urlString = urlString + '?neighborhood=';
-            for (i in neighborhoodsToInclude) {
-                urlString = urlString + neighborhoodsToInclude[i] + ',';
+
+        if(neighborhoodsToInclude.length != lastHoods.length){
+            same = false;
+        }
+        else{
+            for(i = 0; i < neighborhoodsToInclude.length; i++){
+                if(neighborhoodsToInclude[i] != lastHoods[i]){
+                    same = false;
+                    break;
+                }
             }
         }
-        urlString = urlString.substring(0, urlString.length - 1);
-        console.log(urlString);
 
-        getJSON(urlString)
-        .then((data) => {
-            pushTableData(data, table)
-            /*
-            getJSON('http://localhost:8000/neighborhoods').then((values) => {
-                for(i in neighborhood_markers){
-                    L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
-                    .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
+        if(!same){
+            table.clear();
+            lastHoods = neighborhoodsToInclude;
+
+            let urlString = 'http://localhost:8000/incidents'
+            if (neighborhoodsToInclude.length > 0) {
+                urlString = urlString + '?neighborhood=';
+                for (i in neighborhoodsToInclude) {
+                    urlString = urlString + neighborhoodsToInclude[i] + ',';
                 }
-            })
-            */
-        });
-        
+            }
+            urlString = urlString.substring(0, urlString.length - 1);
+            console.log(urlString);
+            
+            populateMap(urlString);
+
+        }
+    }
+
+    map.on('zoom', function() {
+        updateTable();
     });
 
-    getJSON('http://localhost:8000/incidents')
-    .then((data) => {
-        pushTableData(data, table)
-        getJSON('http://localhost:8000/neighborhoods').then((values) => {
-            for(i in neighborhood_markers){
-                L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
-                .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
-            }
-        })
-    });
+    map.on('moveend', function(){
+        updateTable();
+    })
+
+    function populateMap(urlString){
+
+            getJSON(urlString)
+            .then((data) => {
+                pushTableData(data, table)
+                getJSON('http://localhost:8000/neighborhoods').then((values) => {
+                    markerGroup.clearLayers();
+                    for(i in neighborhood_markers){
+                        L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(markerGroup)
+                        .bindPopup(getHoodName(neighborhood_markers[i].marker, values) + "<br>Crimes: " + getCrimes(neighborhood_markers[i].marker, data));
+                    }
+                })
+            });
+       
+
+    }
+
+    populateMap('http://localhost:8000/incidents');
+
 }
+
+
 
 function myScript(argument, date, time, incident) {
     let argumentArray = argument.split("");
@@ -414,7 +436,6 @@ function myScript(argument, date, time, incident) {
 }
 
 function onPopupOpen() {
-
     var tempMarker = this;
 
     // To remove marker on click of delete button in the popup of marker
