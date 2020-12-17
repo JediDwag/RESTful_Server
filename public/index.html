@@ -38,7 +38,7 @@
         <div id="search">
             <h1>Search for a Location</h1>
             <p>Location: <input @keyup.enter="enterPressed" class="searchBox" id="location" type="text" autofocus size="100" placeholder="Enter location" />
-            <button id="searchbtn" type="button">Go</button></p>
+            <button id="searchbtn" type="button" v-on:click="searchLocation">Go</button></p>
         </div>
         <div class="selectors">
           <h3>Table Filters</h3>

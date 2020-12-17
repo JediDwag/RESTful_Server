@@ -66,15 +66,11 @@ function init() {
     getJSON('data/StPaulDistrictCouncil.geojson').then((result) => {
         // St. Paul GeoJSON
         $(result.features).each(function(key, value) {
-            console.log(value);
             district_boundary.addData(value);
         });
     }).catch((error) => {
         console.log('Error:', error);
     });
-
-    var search = document.getElementById("searchbtn");
-    search.addEventListener("click", searchLocation, false);
 
     new Vue({
         el:'#search',
@@ -82,6 +78,7 @@ function init() {
             enterPressed () {
                 searchLocation();
                 console.log(map.getBounds());
+                console.log(map.getBounds().getNorthEast().toString());
             }
         }
     });
@@ -176,9 +173,7 @@ function init() {
 
 function myScript(argument, date, time, incident) {
     let argumentArray = argument.split("");
-    for (var x = 0; x < argument.length; x++)
-    {
-        var c = argument.charAt(x);
+    for (var x = 0; x < argument.length; x++) {
         if (parseInt(argument.charAt(x-1)) != NaN && argument.charAt(x) == "X" && argument.charAt(x+1) == " ") {
             argumentArray[x] = "0";
         }
@@ -247,6 +242,15 @@ function condenseAndPush(thisData, date_part, time_part, table, codes, neighborh
             break;
         }
     }
+    
+    let argument = thisData.block;
+    let argumentArray = argument.split("");
+    for (var x = 0; x < argument.length; x++) {
+        if (parseInt(argument.charAt(x-1)) != NaN && argument.charAt(x) == "X" && argument.charAt(x+1) == " ") {
+            argumentArray[x] = "0";
+        }
+    }
+    let newArgument = argumentArray.join("");
 
     var newData = {
         case_number: thisData.case_number,
@@ -256,7 +260,7 @@ function condenseAndPush(thisData, date_part, time_part, table, codes, neighborh
         incident: thisData.incident,
         police_grid: thisData.police_grid,
         neighborhood: window.neighborhood_from_number,
-        block: thisData.block,
+        block: newArgument,
         code: thisData.code
     }
 
@@ -301,11 +305,8 @@ function getJSON(url) {
 
 function searchLocation(event) {
     var loc = document.getElementById("location");
-    console.log("location value: " + loc.value);
     var url = "https://nominatim.openstreetmap.org/search?q=" + loc.value + "&viewbox=-93.217977,44.883658,-92.993787,45.008206&bounded=1&format=json&accept-language=en";
-    console.log("URL: " + url);
     Promise.all([getJSON(url)]).then((results) => {
-        console.log(results[0][0]);
         map.setView([results[0][0].lat, results[0][0].lon], 16);
         var names = results[0][0].display_name.split(",");
         loc.value = names[0] + "," + names[2];
