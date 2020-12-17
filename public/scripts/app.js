@@ -86,9 +86,85 @@ function init() {
         }
     });
 
+    var table = new Vue({
+        el: '#table',
+        data: {
+          rows: []
+        },
+        methods: {
+            color: function(type){
+                if((type >= 110 & type <= 220) ||
+                (type >= 400 && type <= 453) ||
+                (type >= 810 && type <= 982)){
+                    return "background: lightcoral";
+                }
+                else if((type >= 300 && type <= 374) ||
+                (type >= 500 && type <= 546) ||
+                (type >= 600 && type <= 613) ||
+                (type >= 621 && type <= 712) ||
+                (type >= 1400 && type <= 1436)){
+                    return "background: lightblue";
+                }
+                else if((type >= 550 && type <= 566) ||
+                (type >= 720 && type <= 722)){
+                    return "background: lightgoldenrodyellow";
+                }
+                else if(type >= 1800 && type <= 1885){
+                    return "background: lightgreen";
+                }
+                else if(type == 614 || type == 2619 || type == 9954 || type == 9959){
+                    return "background: lightsalmon";
+                }
+            },
+            clear: function(){
+                this.rows = [];
+            }
+        }
+    });
+
+    var filters = new Vue({
+        el: '#tableFilters',
+
+        data: {
+            personalCrimes: '',
+            propertyCrimes: '',
+            inchoateCrimes: '',
+            statutoryCrimes: '',
+            otherCrimes: '',
+            hood1: '',
+            hood2: '',
+            hood3: '',
+            hood4: '',
+            hood5: '',
+            hood6: '',
+            hood7: '',
+            hood8: '',
+            hood9: '',
+            hood10: '',
+            hood11: '',
+            hood12: '',
+            hood13: '',
+            hood14: '',
+            hood15: '',
+            hood16: '',
+            hood17: '',
+            startDate: '',
+            endDate: '',
+            maxIncidents: ''
+        },
+        methods: {
+            processForm: function(){
+                table.clear();
+                // The rest of the owl
+                //let filterURL = "http://localhost:8000/incidents";
+                
+            }
+        }
+    })
+
     getJSON('http://localhost:8000/incidents')
     .then((data) => {
-        pushTableData(data)
+        pushTableData(data, table)
         getJSON('http://localhost:8000/neighborhoods').then((values) => {
             for(i in neighborhood_markers){
                 L.marker([neighborhood_markers[i].location[0], neighborhood_markers[i].location[1]]).addTo(map)
@@ -187,41 +263,7 @@ function condenseAndPush(thisData, date_part, time_part, table, codes, neighborh
     table.rows.push(newData);
 }
 
-function pushTableData(currentData) {
-
-    var table = new Vue({
-        el: '#table',
-        data: {
-          rows: []
-        },
-        methods: {
-            color: function(type){
-                console.log(type);
-                if((type >= 110 & type <= 220) ||
-                (type >= 400 && type <= 453) ||
-                (type >= 810 && type <= 982)){
-                    return "background: lightcoral";
-                }
-                else if((type >= 300 && type <= 374) ||
-                (type >= 500 && type <= 546) ||
-                (type >= 600 && type <= 613) ||
-                (type >= 621 && type <= 712) ||
-                (type >= 1400 && type <= 1436)){
-                    return "background: lightblue";
-                }
-                else if((type >= 550 && type <= 566) ||
-                (type >= 720 && type <= 722)){
-                    return "background: lightgoldenrodyellow";
-                }
-                else if(type >= 1800 && type <= 1885){
-                    return "background: lightgreen";
-                }
-                else if(type == 614 || type == 2619 || type == 9954 || type == 9959){
-                    return "background: lightsalmon";
-                }
-            }
-        }
-    });
+function pushTableData(currentData, table) {
 
     Promise.all([getJSON('http://localhost:8000/codes'), getJSON('http://localhost:8000/neighborhoods')]).then((values) => {
 

@@ -40,7 +40,80 @@
             <p>Location: <input @keyup.enter="enterPressed" class="searchBox" id="location" type="text" autofocus size="100" placeholder="Enter location" />
             <button id="searchbtn" type="button">Go</button></p>
         </div>
-        <br>
+        <div class="selectors">
+          <h3>Table Filters</h3>
+          <form id="tableFilters" v-on:submit.prevent="processForm">
+            <h4>Crimes:</h4>
+            Personal Crimes:<input type="checkbox" id="personalCrimes" name="personalCrimes" v-model="personalCrimes"> | 
+            Property Crimes:<input type="checkbox" id="propertyCrimes" name="propertyCrimes" v-model="propertyCrimes"> | 
+            Inchoate Crimes:<input type="checkbox" id="inchoateCrimes" name="inchoateCrimes" v-model="inchoateCrimes"> | 
+            Statutory Crimes:<input type="checkbox" id="statutoryCrimes" name="statutoryCrimes" v-model="statutoryCrimes"> | 
+            Financial and Other:<input type="checkbox" id="otherCrimes" name="otherCrimes" v-model="otherCrimes">
+            <h4>Neighborhoods:</h4>
+            Conway/Battlecreek/Highwood:<input type="checkbox" id="hood1" name="hood1" v-model="hood1"> | 
+            Greater East Side:<input type="checkbox" id="hood2" name="hood2" v-model="hood2"> | 
+            West Side:<input type="checkbox" id="hood3" name="hood3" v-model="hood3"> | 
+            Dayton's Bluff:<input type="checkbox" id="hood4" name="hood4" v-model="hood4"> | 
+            Payne/Phalen:<input type="checkbox" id="hood5" name="hood5" v-model="hood5"> | 
+            North End:<input type="checkbox" id="hood6" name="hood6" v-model="hood6"> | 
+            Thomas/Dale(Frogtown):<input type="checkbox" id="hood7" name="hood7" v-model="hood7"> | 
+            Summit/University:<input type="checkbox" id="hood8" name="hood8" v-model="hood8"> | 
+            West Seventh:<input type="checkbox" id="hood9" name="hood9" v-model="hood9"> | 
+            Como:<input type="checkbox" id="hood10" name="hood10" v-model="hood10"> | 
+            Hamline/Midway:<input type="checkbox" id="hood11" name="hood11" v-model="hood11"> | 
+            St. Anthony:<input type="checkbox" id="hood12" name="hood12" v-model="hood12"> | 
+            Union Park:<input type="checkbox" id="hood13" name="hood13" v-model="hood13"> | 
+            Macalester-Groveland:<input type="checkbox" id="hood14" name="hood14" v-model="hood14"> | 
+            Highland:<input type="checkbox" id="hood15" name="hood15" v-model="hood15"> | 
+            Summit Hill:<input type="checkbox" id="hood16" name="hood16" v-model="hood17"> | 
+            Capitol River:<input type="checkbox" id="hood17" name="hood17" v-model="hood17">
+            <h4>Date Range:</h4>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate">
+            <label for="maxIncidents">Max Incidents:</label>
+            <input type="number" min="1" step="1" id="maxIncidents" name="maxIncidents">
+            <br>
+            <button type="submit">Update Table</button>
+            <br>
+
+          </form>
+          <!-- <form id="tableFilters">
+            <h4>Crimes:</h4>
+            Personal Crimes:<input type="checkbox" id="personalCrimes" name="personalCrimes" value="personalCrimes"> | 
+            Property Crimes:<input type="checkbox" id="propertyCrimes" name="propertyCrimes" value="propertyCrimes"> | 
+            Inchoate Crimes:<input type="checkbox" id="inchoateCrimes" name="inchoateCrimes" value="inchoateCrimes"> | 
+            Statutory Crimes:<input type="checkbox" id="statutoryCrimes" name="statutoryCrimes" value="statutoryCrimes"> | 
+            Financial and Other:<input type="checkbox" id="otherCrimes" name="otherCrimes" value="otherCrimes">
+            <h4>Neighborhoods:</h4>
+            Conway/Battlecreek/Highwood:<input type="checkbox" id="hood1" name="hood1" value="hood1"> | 
+            Greater East Side:<input type="checkbox" id="hood2" name="hood2" value="hood2"> | 
+            West Side:<input type="checkbox" id="hood3" name="hood3" value="hood3"> | 
+            Dayton's Bluff:<input type="checkbox" id="hood4" name="hood4" value="hood4"> | 
+            Payne/Phalen:<input type="checkbox" id="hood5" name="hood5" value="hood5"> | 
+            North End:<input type="checkbox" id="hood6" name="hood6" value="hood6"> | 
+            Thomas/Dale(Frogtown):<input type="checkbox" id="hood7" name="hood7" value="hood7"> | 
+            Summit/University:<input type="checkbox" id="hood8" name="hood8" value="hood8"> | 
+            West Seventh:<input type="checkbox" id="hood9" name="hood9" value="hood9"> | 
+            Como:<input type="checkbox" id="hood10" name="hood10" value="hood10"> | 
+            Hamline/Midway:<input type="checkbox" id="hood11" name="hood11" value="hood11"> | 
+            St. Anthony:<input type="checkbox" id="hood12" name="hood12" value="hood12"> | 
+            Union Park:<input type="checkbox" id="hood13" name="hood13" value="hood13"> | 
+            Macalester-Groveland:<input type="checkbox" id="hood14" name="hood14" value="hood14"> | 
+            Highland:<input type="checkbox" id="hood15" name="hood15" value="hood15"> | 
+            Summit Hill:<input type="checkbox" id="hood16" name="hood16" value="hood17"> | 
+            Capitol River:<input type="checkbox" id="hood17" name="hood17" value="hood17">
+            <h4>Date Range:</h4>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate">
+            <label for="maxIncidents">Max Incidents:</label>
+            <input type="number" id="maxIncidents" name="maxIncidents">
+
+          </form> -->
+        </div>
         <div class="legend">Legend: 
           <span style="background: lightcoral">Personal Crimes</span>, 
           <span style="background: lightblue">Property Crimes</span>, 
@@ -49,7 +122,7 @@
           <span style="background: lightsalmon">Financial Crimes and Other</span>
         </div>
         <br>
-        <div id="table">
+        <div id="table" @clear-table="clear()">
             <table class="scrollable">
                 <thead>
                   <tr>
